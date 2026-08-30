@@ -1,0 +1,38 @@
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Python bytecode & caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# IDE & Editor local states
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+
+# Node / Dependency caches (if any)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

@@ -1,0 +1,875 @@
+#!/usr/bin/env python3
+"""
+Python Builder for V-Max Standalone Interactive HTML Guide & Printable PDF Whitepaper.
+Generates a zero-dependency, 100% offline-ready single-file HTML application.
+"""
+
+import os
+import sys
+
+HTML_TEMPLATE = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V-Max (Vibemax) | The 6-Doc Agentic Swarm Framework for Vibe Coding</title>
+<style>
+:root {
+  --bg-base: #07090e;
+  --bg-surface: #0d121f;
+  --bg-card: rgba(17, 24, 39, 0.85);
+  --bg-card-hover: rgba(30, 41, 59, 0.9);
+  --border: rgba(55, 65, 81, 0.6);
+  --border-active: #6366f1;
+  --text-main: #f3f4f6;
+  --text-muted: #9ca3af;
+  --text-dim: #6b7280;
+  --accent-indigo: #6366f1;
+  --accent-indigo-glow: rgba(99, 102, 241, 0.3);
+  --accent-cyan: #06b6d4;
+  --accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-rose: #f43f5e;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "SF Mono", Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  padding: 0;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Background grid effect */
+.bg-grid {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 60%),
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 32px 32px, 32px 32px;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.container {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 32px 20px 80px 20px;
+}
+
+/* Header & Hero */
+header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.badge-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  color: #a5b4fc;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 18px;
+}
+
+.badge-tag span.pulse {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--accent-emerald);
+  box-shadow: 0 0 8px var(--accent-emerald);
+}
+
+h1.hero-title {
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1.2;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+p.hero-subtitle {
+  font-size: 18px;
+  color: var(--text-muted);
+  max-width: 760px;
+  margin: 0 auto 28px auto;
+}
+
+/* Quick Action Links */
+.action-bar {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background: var(--accent-indigo);
+  color: #ffffff;
+  box-shadow: 0 4px 14px var(--accent-indigo-glow);
+}
+.btn-primary:hover {
+  background: #4f46e5;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: rgba(30, 41, 59, 0.8);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover {
+  background: rgba(51, 65, 85, 0.9);
+  border-color: rgba(99, 102, 241, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-emerald {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+.btn-emerald:hover {
+  background: rgba(16, 185, 129, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Navigation Tabs */
+.nav-tabs {
+  display: flex;
+  background: rgba(13, 18, 31, 0.9);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 6px;
+  margin-bottom: 32px;
+  gap: 4px;
+  overflow-x: auto;
+  backdrop-filter: blur(12px);
+}
+
+.tab-btn {
+  flex: 1;
+  min-width: 140px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tab-btn.active {
+  background: var(--accent-indigo);
+  color: #ffffff;
+  box-shadow: 0 2px 8px var(--accent-indigo-glow);
+}
+.tab-btn:hover:not(.active) {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Card Styling */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 32px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+h2.card-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #ffffff;
+}
+
+p.card-desc {
+  color: var(--text-muted);
+  font-size: 15px;
+  margin-bottom: 24px;
+}
+
+/* Comparison Grid */
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.comp-box {
+  padding: 22px;
+  border-radius: 12px;
+}
+
+.comp-box.without {
+  background: rgba(244, 63, 94, 0.06);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+.comp-box.with {
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.comp-box h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.comp-box.without h3 { color: #fb7185; }
+.comp-box.with h3 { color: #34d399; }
+
+.comp-list {
+  list-style: none;
+}
+.comp-list li {
+  font-size: 14px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--text-muted);
+}
+.comp-box.without li span.icon { color: var(--accent-rose); font-weight: bold; }
+.comp-box.with li span.icon { color: var(--accent-emerald); font-weight: bold; }
+
+/* 6 Docs Grid */
+.docs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.doc-card {
+  background: rgba(13, 18, 31, 0.7);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+.doc-card:hover {
+  border-color: var(--accent-indigo);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);
+}
+
+.doc-num {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+  margin-bottom: 6px;
+}
+.doc-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+.doc-path {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #a5b4fc;
+  background: rgba(99, 102, 241, 0.12);
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+.doc-body {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* Swarm Visualizer Simulator */
+.swarm-container {
+  background: rgba(7, 9, 14, 0.8);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  margin-top: 20px;
+}
+
+.swarm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.swarm-agents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.agent-node {
+  background: rgba(17, 24, 39, 0.9);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+.agent-node.active {
+  border-color: var(--accent-emerald);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.2);
+}
+
+.agent-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+.agent-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+.agent-role {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.agent-status {
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 8px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-dim);
+}
+.agent-node.active .agent-status {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+
+.terminal-console {
+  background: #030408;
+  border: 1px solid rgba(55, 65, 81, 0.8);
+  border-radius: 8px;
+  padding: 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #10b981;
+  height: 140px;
+  overflow-y: auto;
+  line-height: 1.6;
+}
+
+/* Multi-IDE Setup Box */
+.ide-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.ide-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.ide-btn.active {
+  background: #1e293b;
+  border-color: var(--accent-cyan);
+  color: #ffffff;
+}
+
+.code-box {
+  background: #05070c;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  position: relative;
+  margin-bottom: 16px;
+}
+.code-box pre {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: #e2e8f0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.copy-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(51, 65, 85, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f1f5f9;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.copy-btn:hover {
+  background: var(--accent-indigo);
+}
+
+/* Toast */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #10b981;
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  pointer-events: none;
+  z-index: 999;
+}
+#toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  border-top: 1px solid var(--border);
+  padding-top: 32px;
+  margin-top: 60px;
+  color: var(--text-dim);
+  font-size: 14px;
+}
+
+/* Print to PDF Stylesheet */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+  .bg-grid, .action-bar, .nav-tabs, .btn, #btn-simulate, #toast {
+    display: none !important;
+  }
+  .card, .doc-card, .comp-box, .code-box, .swarm-container {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: none !important;
+    color: #111827 !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  h1.hero-title {
+    background: none !important;
+    -webkit-text-fill-color: #111827 !important;
+    color: #111827 !important;
+  }
+  .doc-title, h2.card-title, .agent-name {
+    color: #111827 !important;
+  }
+  .comp-box.without { border-color: #fca5a5 !important; background: #fff5f5 !important; }
+  .comp-box.with { border-color: #86efac !important; background: #f0fdf4 !important; }
+  .code-box pre { color: #1e293b !important; }
+  .doc-path { background: #f1f5f9 !important; color: #4338ca !important; border: 1px solid #e2e8f0; }
+}
+
+@media (max-width: 768px) {
+  .comparison-grid { grid-template-columns: 1fr; }
+  h1.hero-title { font-size: 32px; }
+}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="badge-tag">
+      <span class="pulse"></span>
+      <span>VIBEMAX FRAMEWORK v1.0 • OPEN SOURCE</span>
+    </div>
+    <h1 class="hero-title">V-Max (Vibemax)</h1>
+    <p class="hero-subtitle">The 6-Doc Agentic Swarm Framework for Vibe Coding & AI Integrated Software Engineering.</p>
+
+    <div class="action-bar">
+      <a href="https://github.com" target="_blank" class="btn btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        GitHub Repository
+      </a>
+      <a href="https://drive.google.com" target="_blank" class="btn btn-secondary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download Google Drive ZIP
+      </a>
+      <button onclick="window.print()" class="btn btn-emerald">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print / Save as PDF
+      </button>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('tab-overview', this)">Overview & Crisis</button>
+    <button class="tab-btn" onclick="switchTab('tab-docs', this)">The 6 Living Docs</button>
+    <button class="tab-btn" onclick="switchTab('tab-swarm', this)">5-Agent Swarm</button>
+    <button class="tab-btn" onclick="switchTab('tab-handshake', this)">Vision Handshake</button>
+    <button class="tab-btn" onclick="switchTab('tab-setup', this)">Multi-IDE Setup</button>
+  </div>
+
+  <!-- TAB 1: OVERVIEW & CRISIS -->
+  <section id="tab-overview" class="tab-content">
+    <div class="card">
+      <h2 class="card-title">🚨 The 10-Minute Vibe Coding Breakdown</h2>
+      <p class="card-desc">Why do AI coding sessions start like magic, but quickly degrade into broken spaghetti code?</p>
+      
+      <p style="font-size: 15px; color: var(--text-main); margin-bottom: 20px;">
+        When you start a vibe coding project, LLMs (Gemini, Claude, GPT-4) easily write initial files. But after 10-15 prompts, the context window saturates. The AI suffers from <strong>Context Drift & Amnesia</strong>—it forgets previous table columns, invents new button styles, breaks existing routes, and creates duplicate logic.
+      </p>
+
+      <div class="comparison-grid">
+        <div class="comp-box without">
+          <h3><span>❌</span> Without V-Max Framework</h3>
+          <ul class="comp-list">
+            <li><span class="icon">×</span> <strong>Schema Corruption:</strong> AI invents random DB columns & breaks migrations.</li>
+            <li><span class="icon">×</span> <strong>UI Drift:</strong> Mismatched fonts, paddings, and arbitrary hex colors on each prompt.</li>
+            <li><span class="icon">×</span> <strong>Dead Routes:</strong> Broken page links, orphaned views, and 404 redirects.</li>
+            <li><span class="icon">×</span> <strong>Resumption Friction:</strong> Takes 30 mins to explain the project when returning after a break.</li>
+          </ul>
+        </div>
+        <div class="comp-box with">
+          <h3><span>⚡</span> With V-Max Living Docs</h3>
+          <ul class="comp-list">
+            <li><span class="icon">✓</span> <strong>Immutable Schema:</strong> Adheres strictly to visual Mermaid ER diagrams in <code>docs/backend-schema.md</code>.</li>
+            <li><span class="icon">✓</span> <strong>Pixel-Perfect Design:</strong> Inherits unified design tokens from <code>docs/ui-ux-spec.md</code>.</li>
+            <li><span class="icon">✓</span> <strong>Explicit Navigation:</strong> Visual flowchart mapping in <code>docs/app-flow.md</code>.</li>
+            <li><span class="icon">✓</span> <strong>Instant 30s Bootstrap:</strong> Reads <code>docs/</code> and immediately knows 100% of current state.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 2: THE 6 LIVING DOCS -->
+  <section id="tab-docs" class="tab-content" style="display:none;">
+    <div class="card">
+      <h2 class="card-title">📚 The 6 Essential Living Documents</h2>
+      <p class="card-desc">The single source of architectural truth maintained in your project's <code>docs/</code> folder.</p>
+
+      <div class="docs-grid">
+        <div class="doc-card">
+          <div class="doc-num">Document 01</div>
+          <div class="doc-title">Product Requirement (PRD)</div>
+          <div class="doc-path">docs/prd.md</div>
+          <div class="doc-body">The <strong>What</strong> and <strong>Why</strong>. Defines user personas, core problem statement, value proposition, and prioritized feature matrix (Shipped vs. In-Progress vs. Backlog).</div>
+        </div>
+
+        <div class="doc-card">
+          <div class="doc-num">Document 02</div>
+          <div class="doc-title">Technical Requirement (TRD)</div>
+          <div class="doc-path">docs/trd.md</div>
+          <div class="doc-body">The <strong>How</strong>. Tech stack versions, build scripts, environmental variables, third-party APIs (Stripe, OpenAI, Supabase), and security/type constraints.</div>
+        </div>
+
+        <div class="doc-card">
+          <div class="doc-num">Document 03</div>
+          <div class="doc-title">App Flow & Navigation</div>
+          <div class="doc-path">docs/app-flow.md</div>
+          <div class="doc-body">The <strong>User Journey</strong>. Complete visual Mermaid screen navigation flowcharts, route table, modal states, and step-by-step onboarding sequences.</div>
+        </div>
+
+        <div class="doc-card">
+          <div class="doc-num">Document 04</div>
+          <div class="doc-title">UI/UX Design Spec</div>
+          <div class="doc-path">docs/ui-ux-spec.md</div>
+          <div class="doc-body">The <strong>Look & Feel</strong>. Design tokens (Hex/HSL), typography scale, spacing system, Dark/Light modes, and reusable component classes (buttons, cards, inputs).</div>
+        </div>
+
+        <div class="doc-card">
+          <div class="doc-num">Document 05</div>
+          <div class="doc-title">Backend Schema</div>
+          <div class="doc-path">docs/backend-schema.md</div>
+          <div class="doc-body">The <strong>Data Architecture</strong>. Visual Mermaid Entity-Relationship (ER) diagrams, database tables/models, foreign keys, indexes, and API request/response contracts.</div>
+        </div>
+
+        <div class="doc-card">
+          <div class="doc-num">Document 06</div>
+          <div class="doc-title">Implementation Plan</div>
+          <div class="doc-path">docs/implementation-plan.md</div>
+          <div class="doc-body">The <strong>Living Roadmap</strong>. Phased milestones with task checkboxes <code>[x]</code>, active sprint backlog, immediate next build step, and changelog.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 3: 5-AGENT SWARM -->
+  <section id="tab-swarm" class="tab-content" style="display:none;">
+    <div class="card">
+      <h2 class="card-title">🤖 The 5-Specialist Parallel Swarm</h2>
+      <p class="card-desc">V-Max launches 5 specialized subagents working simultaneously to reverse-engineer any project in seconds.</p>
+
+      <div class="swarm-container">
+        <div class="swarm-header">
+          <div>
+            <strong style="color:#ffffff; font-size:15px;">Swarm Execution Topology</strong>
+            <div style="font-size:12px; color:var(--text-muted);">Parallel dispatch across 5 inspection vectors</div>
+          </div>
+          <button id="btn-simulate" onclick="simulateSwarm()" class="btn btn-primary" style="padding:8px 16px; font-size:12px;">
+            ▶️ Run Swarm Simulation
+          </button>
+        </div>
+
+        <div class="swarm-agents-grid">
+          <div class="agent-node" id="agent-1">
+            <div class="agent-icon">📋</div>
+            <div class="agent-name">Product Analyst</div>
+            <div class="agent-role">docs/prd.md</div>
+            <div class="agent-status" id="status-1">IDLE</div>
+          </div>
+
+          <div class="agent-node" id="agent-2">
+            <div class="agent-icon">⚙️</div>
+            <div class="agent-name">Tech Analyst</div>
+            <div class="agent-role">docs/trd.md</div>
+            <div class="agent-status" id="status-2">IDLE</div>
+          </div>
+
+          <div class="agent-node" id="agent-3">
+            <div class="agent-icon">🗺️</div>
+            <div class="agent-name">Flow Mapper</div>
+            <div class="agent-role">docs/app-flow.md</div>
+            <div class="agent-status" id="status-3">IDLE</div>
+          </div>
+
+          <div class="agent-node" id="agent-4">
+            <div class="agent-icon">🎨</div>
+            <div class="agent-name">UI/UX Specialist</div>
+            <div class="agent-role">docs/ui-ux-spec.md</div>
+            <div class="agent-status" id="status-4">IDLE</div>
+          </div>
+
+          <div class="agent-node" id="agent-5">
+            <div class="agent-icon">🗄️</div>
+            <div class="agent-name">Backend Engineer</div>
+            <div class="agent-role">docs/backend-schema.md</div>
+            <div class="agent-status" id="status-5">IDLE</div>
+          </div>
+        </div>
+
+        <div class="terminal-console" id="swarm-console">
+          > System ready. Click 'Run Swarm Simulation' to view parallel agent execution...
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 4: VISION HANDSHAKE -->
+  <section id="tab-handshake" class="tab-content" style="display:none;">
+    <div class="card">
+      <h2 class="card-title">🤝 The Vibe Vision Handshake</h2>
+      <p class="card-desc">Codebases show what was built in the past. Only YOU know what you want to build next.</p>
+
+      <div style="background:rgba(13,18,31,0.8); border:1px solid var(--border); border-radius:12px; padding:24px; margin-bottom:20px;">
+        <h3 style="color:#a5b4fc; font-size:16px; margin-bottom:12px;">The 4-Step Handshake Protocol:</h3>
+        <ol style="margin-left:20px; color:var(--text-muted); font-size:14px; line-height:1.8;">
+          <li><strong>State of the Union:</strong> Agent reports total project completion % and working modules.</li>
+          <li><strong>Gap & Stub Detection:</strong> Agent highlights half-developed features, missing endpoints, or TODO markers.</li>
+          <li><strong>3 Recommended Next Steps:</strong> Agent offers concrete options to finish stubs or launch new features.</li>
+          <li><strong>The Alignment Question:</strong> Asks what you want to build next, locks your decision into the <strong>Active Sprint</strong> in <code>docs/implementation-plan.md</code>, and begins execution!</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 5: MULTI-IDE SETUP -->
+  <section id="tab-setup" class="tab-content" style="display:none;">
+    <div class="card">
+      <h2 class="card-title">⚡ Multi-IDE Setup & Activation Prompts</h2>
+      <p class="card-desc">Use V-Max seamlessly across Antigravity, Claude Code, Cursor, Codex, and Gemini CLI.</p>
+
+      <div class="ide-selector">
+        <button class="ide-btn active" onclick="switchIDE('antigravity', this)">Google Antigravity / Gemini</button>
+        <button class="ide-btn" onclick="switchIDE('claude', this)">Anthropic Claude Code</button>
+        <button class="ide-btn" onclick="switchIDE('cursor', this)">Cursor IDE</button>
+        <button class="ide-btn" onclick="switchIDE('sync', this)">Continuous Sync Prompt</button>
+      </div>
+
+      <div id="ide-antigravity" class="ide-content">
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:8px;">Command / Prompt in Antigravity Chat:</p>
+        <div class="code-box">
+          <button class="copy-btn" onclick="copyCode('prompt-antigravity')">Copy Prompt</button>
+          <pre id="prompt-antigravity">/vibemax</pre>
+        </div>
+        <p style="font-size:12px; color:var(--text-dim);">Or say: "Please vibemax this project: dispatch the subagent swarm, generate the 6 living docs in docs/, conduct the vision handshake, and initialize universal memory files."</p>
+      </div>
+
+      <div id="ide-claude" class="ide-content" style="display:none;">
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:8px;">Prompt in Claude Code Terminal:</p>
+        <div class="code-box">
+          <button class="copy-btn" onclick="copyCode('prompt-claude')">Copy Prompt</button>
+          <pre id="prompt-claude">Please read ~/.gemini/config/skills/vibemax/SKILL.md and execute the Vibemax workflow: scan this project, create the 6 living docs in docs/, conduct the vision handshake, and update CLAUDE.md.</pre>
+        </div>
+      </div>
+
+      <div id="ide-cursor" class="ide-content" style="display:none;">
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:8px;">Prompt in Cursor Composer (Cmd+I / Ctrl+I):</p>
+        <div class="code-box">
+          <button class="copy-btn" onclick="copyCode('prompt-cursor')">Copy Prompt</button>
+          <pre id="prompt-cursor">@~/.gemini/config/skills/vibemax/SKILL.md Vibemax this project. Scan the codebase, create docs/ with all 6 essential documents, conduct the vision handshake, and update .cursorrules.</pre>
+        </div>
+      </div>
+
+      <div id="ide-sync" class="ide-content" style="display:none;">
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:8px;">Daily Continuous Sync Prompt (Any AI tool):</p>
+        <div class="code-box">
+          <button class="copy-btn" onclick="copyCode('prompt-sync')">Copy Prompt</button>
+          <pre id="prompt-sync">Vibemax sync: audit recent git diff and update docs/ and implementation-plan.md.</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>V-Max (Vibemax) Framework • Open Source under MIT License</p>
+    <p style="margin-top:4px;">Built with ❤️ for the Global AI & Vibe Coding Community.</p>
+  </footer>
+
+</div>
+
+<div id="toast">Copied to clipboard!</div>
+
+<script>
+function switchTab(tabId, el) {
+  document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(tabId).style.display = 'block';
+  el.classList.add('active');
+}
+
+function switchIDE(ideId, el) {
+  document.querySelectorAll('.ide-content').forEach(c => c.style.display = 'none');
+  document.querySelectorAll('.ide-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('ide-' + ideId).style.display = 'block';
+  el.classList.add('active');
+}
+
+function copyCode(elementId) {
+  const text = document.getElementById(elementId).innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  });
+}
+
+function simulateSwarm() {
+  const consoleEl = document.getElementById('swarm-console');
+  const btn = document.getElementById('btn-simulate');
+  btn.disabled = true;
+  btn.innerText = "⏳ Swarm Running...";
+  consoleEl.innerHTML = "> Initiating Vibemax 5-Specialist Parallel Swarm Scan...\\n";
+
+  const agents = [
+    { id: 1, name: "Product Analyst", doc: "docs/prd.md", time: 600 },
+    { id: 2, name: "Tech Analyst", doc: "docs/trd.md", time: 900 },
+    { id: 3, name: "Flow Mapper", doc: "docs/app-flow.md", time: 1200 },
+    { id: 4, name: "UI/UX Specialist", doc: "docs/ui-ux-spec.md", time: 1500 },
+    { id: 5, name: "Backend Engineer", doc: "docs/backend-schema.md", time: 1800 }
+  ];
+
+  agents.forEach(a => {
+    const node = document.getElementById('agent-' + a.id);
+    const status = document.getElementById('status-' + a.id);
+    node.classList.add('active');
+    status.innerText = "SCANNING...";
+    
+    setTimeout(() => {
+      status.innerText = "COMPLETED ✓";
+      consoleEl.innerHTML += `> [${a.name}] Generated ${a.doc} successfully.\\n`;
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    }, a.time);
+  });
+
+  setTimeout(() => {
+    consoleEl.innerHTML += "> [Lead Agent] Synthesis Pass Complete. Gap Analysis: 65% code complete.\\n";
+    consoleEl.innerHTML += "> [Handshake] Ready for Vision Handshake with User!\\n";
+    consoleEl.scrollTop = consoleEl.scrollHeight;
+    btn.disabled = false;
+    btn.innerText = "✓ Swarm Finished";
+  }, 2200);
+}
+</script>
+</body>
+</html>
+"""
+
+def main():
+    target_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    target_html = os.path.join(target_dir, "V-MAX_GUIDE.html")
+    
+    with open(target_html, "w", encoding="utf-8") as f:
+        f.write(HTML_TEMPLATE)
+    
+    print(f"✅ Generated V-MAX_GUIDE.html successfully at: {target_html}")
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())
